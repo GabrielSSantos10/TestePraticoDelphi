@@ -1,0 +1,119 @@
+unit LogDAO;
+
+interface
+
+uses
+  System.SysUtils, System.Generics.Collections, FireDAC.Comp.Client, FireDAC.DApt, uLog;
+
+type
+  TLogDAO = class
+  private
+    FConn: TFDConnection;
+  public
+    constructor Create(AConn: TFDConnection);
+
+    function BuscarPorID(AID: Integer): TLog;
+    function BuscarTodos: TObjectList<TLog>;
+    function Inserir(Log: TLog): Boolean;
+    function Excluir(AID: Integer): Boolean;
+  end;
+
+implementation
+
+constructor TLogDAO.Create(AConn: TFDConnection);
+begin
+  FConn := AConn;
+end;
+
+function TLogDAO.BuscarPorID(AID: Integer): TLog;
+var
+  qry: TFDQuery;
+begin
+  Result := nil;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'SELECT * FROM Log WHERE log_id = :id';
+    qry.ParamByName('id').AsInteger := AID;
+    qry.Open;
+    if not qry.Eof then
+      Result := TLog.Create(
+        qry.FieldByName('log_id').AsInteger,
+        qry.FieldByName('usuario_id').AsInteger,
+        qry.FieldByName('acao').AsString,
+        qry.FieldByName('data_hora').AsDateTime,
+        qry.FieldByName('detalhes').AsString
+      );
+  finally
+    qry.Free;
+  end;
+end;
+
+function TLogDAO.BuscarTodos: TObjectList<TLog>;
+var
+  qry: TFDQuery;
+  item: TLog;
+begin
+  Result := TObjectList<TLog>.Create;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'SELECT * FROM Log';
+    qry.Open;
+    while not qry.Eof do
+    begin
+      item := TLog.Create(
+        qry.FieldByName('log_id').AsInteger,
+        qry.FieldByName('usuario_id').AsInteger,
+        qry.FieldByName('acao').AsString,
+        qry.FieldByName('data_hora').AsDateTime,
+        qry.FieldByName('detalhes').AsString
+      );
+      Result.Add(item);
+      qry.Next;
+    end;
+  finally
+    qry.Free;
+  end;
+end;
+
+function TLogDAO.Inserir(Log: TLog): Boolean;
+var
+  qry: TFDQuery;
+begin
+  Result := False;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text :=
+      'INSERT INTO Log (usuario_id, acao, data_hora, detalhes) ' +
+      'VALUES (:usuario_id, :acao, :data_hora, :detalhes)';
+    qry.ParamByName('usuario_id').AsInteger := Log.UsuarioID;
+    qry.ParamByName('acao').AsString := Log.Acao;
+    qry.ParamByName('data_hora').AsDateTime := Log.DataHora;
+    qry.ParamByName('detalhes').AsString := Log.Detalhes;
+    qry.ExecSQL;
+    Result := True;
+  finally
+    qry.Free;
+  end;
+end;
+
+function TLogDAO.Excluir(AID: Integer): Boolean;
+var
+  qry: TFDQuery;
+begin
+  Result := False;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'DELETE FROM Log WHERE log_id = :id';
+    qry.ParamByName('id').AsInteger := AID;
+    qry.ExecSQL;
+    Result := True;
+  finally
+    qry.Free;
+  end;
+end;
+
+end.

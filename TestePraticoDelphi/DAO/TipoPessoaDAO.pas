@@ -1,0 +1,127 @@
+unit TipoPessoaDAO;
+
+interface
+
+uses
+  System.SysUtils, System.Generics.Collections, FireDAC.Comp.Client, FireDAC.DApt, uTipoPessoa;
+
+type
+  TTipoPessoaDAO = class
+  private
+    FConn: TFDConnection;
+  public
+    constructor Create(AConn: TFDConnection);
+
+    function BuscarPorID(AID: Integer): TTipoPessoa;
+    function BuscarTodos: TObjectList<TTipoPessoa>;
+    function Inserir(Tipo: TTipoPessoa): Boolean;
+    function Atualizar(Tipo: TTipoPessoa): Boolean;
+    function Excluir(AID: Integer): Boolean;
+  end;
+
+implementation
+
+constructor TTipoPessoaDAO.Create(AConn: TFDConnection);
+begin
+  FConn := AConn;
+end;
+
+function TTipoPessoaDAO.BuscarPorID(AID: Integer): TTipoPessoa;
+var
+  qry: TFDQuery;
+begin
+  Result := nil;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'SELECT tipo_pessoa_id, descricao FROM TipoPessoa WHERE tipo_pessoa_id = :id';
+    qry.ParamByName('id').AsInteger := AID;
+    qry.Open;
+    if not qry.Eof then
+      Result := TTipoPessoa.Create(
+        qry.FieldByName('tipo_pessoa_id').AsInteger,
+        qry.FieldByName('descricao').AsString
+      );
+  finally
+    qry.Free;
+  end;
+end;
+
+function TTipoPessoaDAO.BuscarTodos: TObjectList<TTipoPessoa>;
+var
+  qry: TFDQuery;
+  item: TTipoPessoa;
+begin
+  Result := TObjectList<TTipoPessoa>.Create;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'SELECT tipo_pessoa_id, descricao FROM TipoPessoa';
+    qry.Open;
+    while not qry.Eof do
+    begin
+      item := TTipoPessoa.Create(
+        qry.FieldByName('tipo_pessoa_id').AsInteger,
+        qry.FieldByName('descricao').AsString
+      );
+      Result.Add(item);
+      qry.Next;
+    end;
+  finally
+    qry.Free;
+  end;
+end;
+
+function TTipoPessoaDAO.Inserir(Tipo: TTipoPessoa): Boolean;
+var
+  qry: TFDQuery;
+begin
+  Result := False;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'INSERT INTO TipoPessoa (descricao) VALUES (:descricao)';
+    qry.ParamByName('descricao').AsString := Tipo.Descricao;
+    qry.ExecSQL;
+    Result := True;
+  finally
+    qry.Free;
+  end;
+end;
+
+function TTipoPessoaDAO.Atualizar(Tipo: TTipoPessoa): Boolean;
+var
+  qry: TFDQuery;
+begin
+  Result := False;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'UPDATE TipoPessoa SET descricao = :descricao WHERE tipo_pessoa_id = :id';
+    qry.ParamByName('descricao').AsString := Tipo.Descricao;
+    qry.ParamByName('id').AsInteger := Tipo.ID;
+    qry.ExecSQL;
+    Result := True;
+  finally
+    qry.Free;
+  end;
+end;
+
+function TTipoPessoaDAO.Excluir(AID: Integer): Boolean;
+var
+  qry: TFDQuery;
+begin
+  Result := False;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'DELETE FROM TipoPessoa WHERE tipo_pessoa_id = :id';
+    qry.ParamByName('id').AsInteger := AID;
+    qry.ExecSQL;
+    Result := True;
+  finally
+    qry.Free;
+  end;
+end;
+
+end.

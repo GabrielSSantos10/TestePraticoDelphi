@@ -1,0 +1,27 @@
+program CadastroPessoas;
+
+uses
+  Vcl.Forms,
+  MainForm in 'MainForm.pas' {Form1},
+  uTipoPessoa in 'Model\uTipoPessoa.pas',
+  uEndereco in 'Model\uEndereco.pas',
+  TipoPessoaDAO in 'DAO\TipoPessoaDAO.pas',
+  EnderecoDAO in 'DAO\EnderecoDAO.pas',
+  uPessoa in 'Model\uPessoa.pas',
+  uUsuario in 'Model\uUsuario.pas',
+  PessoaDAO in 'DAO\PessoaDAO.pas',
+  UsuarioDAO in 'DAO\UsuarioDAO.pas',
+  uLog in 'Model\uLog.pas',
+  LogDAO in 'DAO\LogDAO.pas',
+  uLoginForm in 'View\uLoginForm.pas' {Form2},
+  uHash in 'Utils\uHash.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TForm2, Form2);
+  Application.Run;
+end.

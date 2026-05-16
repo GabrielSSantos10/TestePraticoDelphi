@@ -1,0 +1,47 @@
+unit MainForm;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.WinXCtrls, FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+  FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+  FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef, FireDAC.Stan.ExprFuncs,
+  FireDAC.Phys.SQLiteWrapper.Stat, FireDAC.VCLUI.Wait, Data.DB,
+  FireDAC.Comp.Client, Vcl.StdCtrls, Vcl.ExtCtrls;
+
+type
+  TForm1 = class(TForm)
+    FDConnection: TFDConnection;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+  var
+  LoginForm: TLoginForm;
+begin
+  LoginForm := TLoginForm.Create(nil);
+  try
+    LoginForm.SetConnection(FDConnection);
+    if LoginForm.ShowModal = mrOk then
+    begin
+      // Login Ok, carregar tela principal
+      // Aqui você pode acessar a propriedade do usuário logado, se salvou
+    end
+    else
+      Application.Terminate; // Sai do programa se não logar
+  finally
+    LoginForm.Free;
+  end;
+end;
+
+implementation
+
+{$R *.dfm}
+
+end.

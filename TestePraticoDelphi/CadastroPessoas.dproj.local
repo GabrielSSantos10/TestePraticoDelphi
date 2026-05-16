@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2026/05/14 13:39:24.000.725,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2026/05/14 15:16:19.000.154,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\Unit1.dfm=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\MainForm.dfm</Transaction>
+    <Transaction>2026/05/14 15:16:19.000.154,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\Unit1.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\MainForm.pas</Transaction>
+    <Transaction>2026/05/14 15:16:40.000.111,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\CadastroPessoas.dproj</Transaction>
+    <Transaction>2026/05/14 15:33:27.602,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/14 15:33:56.176,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Model\uTipoPessoa.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/14 15:34:39.759,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/14 15:34:55.843,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Model\uEndereco.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 10:05:46.296,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 10:06:17.590,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\DAO\TipoPessoaDAO.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 10:46:34.202,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 10:47:04.534,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\DAO\EnderecoDAO.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 12:10:15.706,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 12:10:39.094,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Model\uPessoa.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 12:10:55.231,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 12:11:19.855,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\uUsuario.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 12:13:33.025,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 12:14:04.460,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Model\uUsuario.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 12:16:49.347,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 12:17:18.056,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\DAO\PessoaDAO.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 12:17:28.535,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 12:18:21.997,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\DAO\UsuarioDAO.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 12:18:44.213,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 12:19:01.308,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Model\uLog.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 12:19:50.367,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 12:20:25.160,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\DAO\LogDAO.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/15 13:10:00.353,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit2.pas</Transaction>
+    <Transaction>2026/05/16 00:27:56.880,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit2.pas</Transaction>
+    <Transaction>2026/05/16 00:30:05.209,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\View\uLoginForm.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit2.pas</Transaction>
+    <Transaction>2026/05/16 00:30:05.209,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\View\uLoginForm.dfm=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit2.dfm</Transaction>
+    <Transaction>2026/05/16 00:37:17.541,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/16 00:37:39.008,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Utils\uHash.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit1.pas</Transaction>
+    <Transaction>2026/05/16 01:05:42.173,=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit2.pas</Transaction>
+    <Transaction>2026/05/16 01:07:33.895,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\View\uLoginForm.pas=</Transaction>
+    <Transaction>2026/05/16 01:08:32.963,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\View\uLoginForm.pas=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit2.pas</Transaction>
+    <Transaction>2026/05/16 01:08:32.963,C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\View\uLoginForm.dfm=C:\Users\Gabriel Simplicio\Documents\Embarcadero\Studio\Projects\TestePraticoDelphi\Unit2.dfm</Transaction>
+  </Transactions>
+</BorlandProject>
