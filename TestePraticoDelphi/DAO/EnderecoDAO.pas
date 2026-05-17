@@ -17,6 +17,7 @@ type
     function Inserir(Endereco: TEndereco): Boolean;
     function Atualizar(Endereco: TEndereco): Boolean;
     function Excluir(AID: Integer): Boolean;
+    function GetLastInsertID: Integer;
   end;
 
 implementation
@@ -143,6 +144,21 @@ begin
     qry.ParamByName('id').AsInteger := AID;
     qry.ExecSQL;
     Result := True;
+  finally
+    qry.Free;
+  end;
+end;
+
+function TEnderecoDAO.GetLastInsertID: Integer;
+var
+  qry: TFDQuery;
+begin
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'SELECT last_insert_rowid() AS ID';
+    qry.Open;
+    Result := qry.FieldByName('ID').AsInteger;
   finally
     qry.Free;
   end;

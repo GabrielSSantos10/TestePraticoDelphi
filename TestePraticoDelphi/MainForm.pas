@@ -17,6 +17,7 @@ type
     FDConnection: TFDConnection;
     // seus controles
     procedure FormShow(Sender: TObject);
+    procedure FDConnectionAfterConnect(Sender: TObject);
   private
     FUsuarioLogado: TUsuario;
   public
@@ -29,6 +30,11 @@ var
 implementation
 
 {$R *.dfm}
+
+procedure TForm1.FDConnectionAfterConnect(Sender: TObject);
+begin
+  FDConnection.ExecSQL('PRAGMA foreign_keys = ON;');
+end;
 
 procedure TForm1.FormShow(Sender: TObject);
 var

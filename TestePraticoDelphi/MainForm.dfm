@@ -1,7 +1,7 @@
 object Form1: TForm1
   Left = 0
   Top = 0
-  Caption = 'Form1'
+  Caption = 'MainForm'
   ClientHeight = 381
   ClientWidth = 624
   Color = clBtnFace
@@ -21,6 +21,7 @@ object Form1: TForm1
       'OpenMode=CreateUTF8')
     ResourceOptions.AssignedValues = [rvSilentMode]
     ResourceOptions.SilentMode = True
+    AfterConnect = FDConnectionAfterConnect
     Left = 48
     Top = 16
   end

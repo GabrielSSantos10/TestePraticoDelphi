@@ -1,0 +1,91 @@
+unit uConsultaPessoasForm;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, FireDAC.Comp.Client,
+  uUsuario, uCadastroAlteraPessoaForm, Data.DB, Vcl.Grids, Vcl.DBGrids,
+  Vcl.ExtCtrls, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, Vcl.Mask;
+
+type
+  TuConsultarPessoas = class(TForm)
+    btnCadastrar: TButton;
+    btnConsultar: TButton;
+    btnConsultarTudo: TButton;
+    btnLogout: TButton;
+    gridPessoas: TDBGrid;
+    Panel1: TPanel;
+    lblNomePessoa: TLabel;
+    Panel2: TPanel;
+    edtNomePessoa: TEdit;
+    lblEmail: TLabel;
+    lblCPF: TLabel;
+    edtMaskCPF: TMaskEdit;
+    edtMaskEmail: TMaskEdit;
+    qryConsulta: TFDQuery;
+    dsConsulta: TDataSource;
+    btnDetalhar: TButton;
+    procedure btnCadastrarClick(Sender: TObject);
+    procedure btnLogoutClick(Sender: TObject);
+    procedure btnDetalharClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    FConn: TFDConnection;
+    FUsuarioLogado: TUsuario;
+  end;
+
+var
+  uConsultarPessoas: TuConsultarPessoas;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  uLoginForm;
+
+procedure TuConsultarPessoas.btnCadastrarClick(Sender: TObject);
+begin
+if not Assigned(uCadastrarAlterarPessoaForm) then
+    Application.CreateForm(TuCadastrarAlterarPessoaForm, uCadastrarAlterarPessoaForm);
+
+  // Chama o método para configurar como INSERIR e passa o usuário
+  uCadastrarAlterarPessoaForm.PrepararTela('INSERIR', Self.FUsuarioLogado);
+
+  // Exibe a tela travando a tela de trás (ShowModal)
+  uCadastrarAlterarPessoaForm.ShowModal;
+end;
+
+procedure TuConsultarPessoas.btnDetalharClick(Sender: TObject);
+begin
+  var
+  PessoaID: Integer;
+begin
+  if not qryConsulta.IsEmpty then
+  begin
+    PessoaID := qryConsulta.FieldByName('pessoa_id').AsInteger;
+
+    // Aqui você buscará a Pessoa pelo Controller usando esse ID
+    // E chamará a tela de cadastro passando o modo 'DETALHAR'
+  end;
+end;
+end;
+
+procedure TuConsultarPessoas.btnLogoutClick(Sender: TObject);
+begin
+  if Assigned(FUsuarioLogado) then
+    FreeAndNil(FUsuarioLogado);
+
+  LoginForm.edtSenha.Clear;
+
+  LoginForm.Show;
+
+  Self.Close;
+end;
+
+end.

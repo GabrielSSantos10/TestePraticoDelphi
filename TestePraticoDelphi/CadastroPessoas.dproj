@@ -140,6 +140,18 @@
         <DCCReference Include="View\uLoginForm.pas">
             <Form>LoginForm</Form>
         </DCCReference>
+        <DCCReference Include="View\uCadastroAlteraPessoaForm.pas">
+            <Form>uCadastrarAlterarPessoaForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Controller\PessoaController.pas"/>
+        <DCCReference Include="Controller\EnderecoController.pas"/>
+        <DCCReference Include="View\uConsultaPessoasForm.pas">
+            <Form>uConsultarPessoas</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Controller\UsuarioController.pas"/>
+        <DCCReference Include="Utils\uValidador.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, UsuarioDAO, uUsuario,
-  FireDAC.Comp.Client, FireDAC.DApt, uHash;
+  FireDAC.Comp.Client, FireDAC.DApt, uHash, UsuarioController, uConsultaPessoasForm;
 
 type
   TLoginForm = class(TForm)
@@ -40,53 +40,44 @@ end;
 
 procedure TLoginForm.FormCreate(Sender: TObject);
 begin
-  Label1.Caption := '';
+  Label1.Caption := 'Digite seu usuário e senha para acessar o sistema';
   edtSenha.PasswordChar := '*';
 end;
 
 procedure TLoginForm.btnEntrarClick(Sender: TObject);
 var
-  UsuarioDAO: TUsuarioDAO;
-  Usuario: TUsuario;
-  SenhaHash: string;
+  Controller: TUsuarioController;
 begin
   Label1.Caption := '';
-  UsuarioDAO := TUsuarioDAO.Create(FConn);
+  Controller := TUsuarioController.Create(FConn);
   try
-    try
-      Usuario := UsuarioDAO.BuscarPorLogin(Trim(edtLogin.Text));
-      if Assigned(Usuario) then
-      begin
-        SenhaHash := GerarMD5(Trim(edtSenha.Text));
-        if SenhaHash = Usuario.SenhaHash then
-        begin
-          FUsuarioLogado := Usuario;
-          Label1.Caption := 'Login realizado com sucesso!';
-          Label1.Font.Color := clGreen;
-        end
-        else
-        begin
-          Label1.Caption := 'Senha incorreta!';
-          Label1.Font.Color := clRed;
-          edtSenha.Clear;
-          edtSenha.SetFocus;
-        end;
-      end
-      else
-      begin
-        Label1.Caption := 'Usuário não encontrado!';
-        Label1.Font.Color := clRed;
-      end;
-    except
-      on E: Exception do
-      begin
-        ShowMessage('Erro no login: ' + E.Message);
-        Label1.Caption := 'Erro ao acessar banco de dados!';
-        Label1.Font.Color := clRed;
-      end;
+    // Tenta autenticar
+    FUsuarioLogado := Controller.Autenticar(Trim(edtLogin.Text), Trim(edtSenha.Text));
+
+    if Assigned(FUsuarioLogado) then
+    begin
+      // Esconde a tela de login
+      Self.Hide;
+
+      // Abre a tela de consulta passando a conexão e quem logou
+      if not Assigned(uConsultarPessoas) then
+        Application.CreateForm(TuConsultarPessoas, uConsultarPessoas);
+
+      // Você precisará criar essas variáveis na uConsultaPessoas
+      uConsultarPessoas.FConn := Self.FConn;
+      uConsultarPessoas.FUsuarioLogado := Self.FUsuarioLogado;
+
+      uConsultarPessoas.Show; // Mostra a próxima tela
+    end
+    else
+    begin
+      Label1.Caption := 'Usuário ou senha incorretos!';
+      Label1.Font.Color := clRed;
+      edtSenha.Clear;
+      edtSenha.SetFocus;
     end;
   finally
-    UsuarioDAO.Free;
+    Controller.Free;
   end;
 end;
 

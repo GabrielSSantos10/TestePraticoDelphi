@@ -15,7 +15,13 @@ uses
   uLog in 'Model\uLog.pas',
   LogDAO in 'DAO\LogDAO.pas',
   uHash in 'Utils\uHash.pas',
-  uLoginForm in 'View\uLoginForm.pas' {LoginForm};
+  uLoginForm in 'View\uLoginForm.pas' {LoginForm},
+  uCadastroAlteraPessoaForm in 'View\uCadastroAlteraPessoaForm.pas' {uCadastrarAlterarPessoaForm},
+  PessoaController in 'Controller\PessoaController.pas',
+  EnderecoController in 'Controller\EnderecoController.pas',
+  uConsultaPessoasForm in 'View\uConsultaPessoasForm.pas' {uConsultarPessoas},
+  UsuarioController in 'Controller\UsuarioController.pas',
+  uValidador in 'Utils\uValidador.pas';
 
 {$R *.res}
 
@@ -23,7 +29,8 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TForm1, Form1);
-
+  Application.CreateForm(TuCadastrarAlterarPessoaForm, uCadastrarAlterarPessoaForm);
+  Application.CreateForm(TuConsultarPessoas, uConsultarPessoas);
   LoginForm := TLoginForm.Create(nil);
   try
     LoginForm.SetConnection(Form1.FDConnection);

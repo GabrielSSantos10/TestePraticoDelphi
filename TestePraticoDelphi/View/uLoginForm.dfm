@@ -1,7 +1,7 @@
 object LoginForm: TLoginForm
   Left = 0
   Top = 0
-  Caption = 'LoginForm'
+  Caption = 'Login'
   ClientHeight = 441
   ClientWidth = 624
   Color = clBtnFace
@@ -36,7 +36,7 @@ object LoginForm: TLoginForm
     AlignWithMargins = True
     Left = 168
     Top = 32
-    Width = 233
+    Width = 59
     Height = 15
     Alignment = taCenter
     Caption = 'Mensagem'

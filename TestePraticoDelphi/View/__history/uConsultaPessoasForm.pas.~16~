@@ -1,0 +1,129 @@
+unit uConsultaPessoasForm;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, FireDAC.Comp.Client,
+  uUsuario, uCadastroAlteraPessoaForm, Data.DB, Vcl.Grids, Vcl.DBGrids,
+  Vcl.ExtCtrls, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, Vcl.Mask;
+
+type
+  TuConsultarPessoas = class(TForm)
+    btnCadastrar: TButton;
+    btnConsultar: TButton;
+    btnConsultarTudo: TButton;
+    btnLogout: TButton;
+    gridPessoas: TDBGrid;
+    Panel1: TPanel;
+    lblNomePessoa: TLabel;
+    Panel2: TPanel;
+    edtNomePessoa: TEdit;
+    lblEmail: TLabel;
+    lblCPF: TLabel;
+    edtMaskCPF: TMaskEdit;
+    edtMaskEmail: TMaskEdit;
+    qryConsulta: TFDQuery;
+    dsConsulta: TDataSource;
+    btnDetalhar: TButton;
+    procedure btnCadastrarClick(Sender: TObject);
+    procedure btnLogoutClick(Sender: TObject);
+    procedure btnDetalharClick(Sender: TObject);
+    procedure btnConsultarTudoClick(Sender: TObject);
+    procedure btnConsultarClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    FConn: TFDConnection;
+    FUsuarioLogado: TUsuario;
+  end;
+
+var
+  uConsultarPessoas: TuConsultarPessoas;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  uLoginForm;
+
+procedure TuConsultarPessoas.btnCadastrarClick(Sender: TObject);
+begin
+if not Assigned(uCadastrarAlterarPessoaForm) then
+    Application.CreateForm(TuCadastrarAlterarPessoaForm, uCadastrarAlterarPessoaForm);
+
+  uCadastrarAlterarPessoaForm.FConn := Self.FConn;
+
+  uCadastrarAlterarPessoaForm.PrepararTela('INSERIR', Self.FUsuarioLogado);
+
+  uCadastrarAlterarPessoaForm.ShowModal;
+end;
+
+procedure TuConsultarPessoas.btnConsultarClick(Sender: TObject);
+var
+  vSQL: string;
+begin
+  vSQL := 'SELECT p.pessoa_id, p.nome, t.descricao as tipo_pessoa, p.cpf ' +
+          'FROM Pessoa p ' +
+          'INNER JOIN TipoPessoa t ON p.tipo_pessoa_id = t.tipo_pessoa_id ' +
+          'WHERE 1=1 '; // O "1=1" é um truque para encadear os ANDs dinamicamente
+
+  // Filtro por Nome
+  if Trim(edtNomePessoa.Text) <> '' then
+    vSQL := vSQL + ' AND p.nome LIKE ' + QuotedStr('%' + Trim(edtNomePessoa.Text) + '%');
+
+  // Filtro por CPF (removendo a máscara para testar se tá vazio)
+  if Trim(StringReplace(edtMaskCPF.Text, '-', '', [rfReplaceAll])) <> '' then
+    vSQL := vSQL + ' AND p.cpf LIKE ' + QuotedStr('%' + Trim(edtMaskCPF.Text) + '%');
+
+  // Filtro por E-mail
+  if Trim(edtMaskEmail.Text) <> '' then
+     vSQL := vSQL + ' AND p.email LIKE ' + QuotedStr('%' + Trim(edtMaskEmail.Text) + '%');
+
+  qryConsulta.Close;
+  qryConsulta.Connection := Self.FConn;
+  qryConsulta.SQL.Text := vSQL;
+  qryConsulta.Open;
+end;
+
+procedure TuConsultarPessoas.btnConsultarTudoClick(Sender: TObject);
+begin
+  qryConsulta.Close;
+  qryConsulta.Connection := Self.FConn;
+  qryConsulta.SQL.Text :=
+    'SELECT p.pessoa_id, p.nome, t.descricao as tipo_pessoa, p.cpf ' +
+    'FROM Pessoa p ' +
+    'INNER JOIN TipoPessoa t ON p.tipo_pessoa_id = t.tipo_pessoa_id';
+  qryConsulta.Open;
+end;
+
+procedure TuConsultarPessoas.btnDetalharClick(Sender: TObject);
+var
+  PessoaID: Integer;
+begin
+  if not qryConsulta.IsEmpty then
+  begin
+    PessoaID := qryConsulta.FieldByName('pessoa_id').AsInteger;
+
+    // Aqui você buscará a Pessoa pelo Controller usando esse ID
+    // E chamará a tela de cadastro passando o modo 'DETALHAR'
+  end;
+end;
+
+procedure TuConsultarPessoas.btnLogoutClick(Sender: TObject);
+begin
+  if Assigned(FUsuarioLogado) then
+    FreeAndNil(FUsuarioLogado);
+
+  LoginForm.edtSenha.Clear;
+
+  LoginForm.Show;
+
+  Self.Close;
+end;
+
+end.
