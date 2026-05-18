@@ -51,23 +51,19 @@ begin
   Label1.Caption := '';
   Controller := TUsuarioController.Create(FConn);
   try
-    // Tenta autenticar
     FUsuarioLogado := Controller.Autenticar(Trim(edtLogin.Text), Trim(edtSenha.Text));
 
     if Assigned(FUsuarioLogado) then
     begin
-      // Esconde a tela de login
       Self.Hide;
 
-      // Abre a tela de consulta passando a conexão e quem logou
       if not Assigned(uConsultarPessoas) then
         Application.CreateForm(TuConsultarPessoas, uConsultarPessoas);
 
-      // Você precisará criar essas variáveis na uConsultaPessoas
       uConsultarPessoas.FConn := Self.FConn;
       uConsultarPessoas.FUsuarioLogado := Self.FUsuarioLogado;
 
-      uConsultarPessoas.Show; // Mostra a próxima tela
+      uConsultarPessoas.Show;
     end
     else
     begin

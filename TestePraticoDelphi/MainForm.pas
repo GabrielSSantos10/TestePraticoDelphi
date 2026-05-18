@@ -15,7 +15,6 @@ uses
 type
   TForm1 = class(TForm)
     FDConnection: TFDConnection;
-    // seus controles
     procedure FormShow(Sender: TObject);
     procedure FDConnectionAfterConnect(Sender: TObject);
   private
@@ -40,7 +39,6 @@ procedure TForm1.FormShow(Sender: TObject);
 var
   LLoginForm: TLoginForm;
 begin
-  // Só faz login na primeira exibição
   if not Assigned(FUsuarioLogado) then
   begin
     LLoginForm := TLoginForm.Create(Self);
@@ -49,8 +47,6 @@ begin
       if LLoginForm.ShowModal = mrOk then
       begin
         FUsuarioLogado := LLoginForm.UsuarioLogado;
-        // Agora você pode controlar permissões pelo perfil:
-        // if FUsuarioLogado.Perfil = 'ADM' then ... else ...
         ShowMessage('Bem-vindo ' + FUsuarioLogado.Login + '! Perfil: ' + FUsuarioLogado.Perfil);
       end
       else

@@ -14,7 +14,6 @@ type
     constructor Create(AConn: TFDConnection);
     destructor Destroy; override;
 
-    // Retorna o objeto TUsuario se o login for válido, ou nil se falhar
     function Autenticar(Login, SenhaEmTexto: string): TUsuario;
   end;
 
@@ -44,9 +43,9 @@ begin
   begin
     SenhaHash := GerarMD5(SenhaEmTexto);
     if SenhaHash = Usuario.SenhaHash then
-      Result := Usuario // Login e senha corretos
+      Result := Usuario
     else
-      Usuario.Free; // Libera a memória se a senha estiver errada
+      Usuario.Free;
   end;
 end;
 

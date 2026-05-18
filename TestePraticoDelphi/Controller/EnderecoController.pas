@@ -5,7 +5,7 @@ interface
 uses
   uEndereco, EnderecoDAO, FireDAC.Comp.Client, System.SysUtils, System.JSON,
   System.Net.HttpClient, System.Net.URLClient,
-  System.Net.HttpClientComponent; // <-- UNIT ADICIONADA AQUI
+  System.Net.HttpClientComponent;
 
 type
   TEnderecoController = class
@@ -16,13 +16,11 @@ type
     constructor Create(AConn: TFDConnection);
     destructor Destroy; override;
 
-    // CRUD
     function Inserir(Endereco: TEndereco): Boolean;
     function Atualizar(Endereco: TEndereco): Boolean;
     function Excluir(EnderecoID: Integer): Boolean;
     function BuscarPorID(EnderecoID: Integer): TEndereco;
 
-    // Integração VIACEP
     function BuscarEnderecoViaCEP(CEP: string; out Endereco: TEndereco): Boolean;
   end;
 
@@ -79,27 +77,26 @@ begin
       if JSON <> nil then
       begin
         try
-          // O ViaCEP retorna um nó "erro": true quando o CEP não existe
           if JSON.GetValue('erro') = nil then
           begin
             Endereco := uEndereco.TEndereco.Create(
-              0, // ID será gerado ao inserir no banco
+              0,
               JSON.GetValue<string>('cep', ''),
               JSON.GetValue<string>('logradouro', ''),
-              JSON.GetValue<string>('complemento', ''), // Mapeando o complemento que vem da API
+              JSON.GetValue<string>('complemento', ''),
               JSON.GetValue<string>('bairro', ''),
-              JSON.GetValue<string>('localidade', ''),  // ViaCEP chama a cidade de localidade
-              JSON.GetValue<string>('uf', '')           // Pode trocar por 'estado' se preferir o nome por extenso
+              JSON.GetValue<string>('localidade', ''),
+              JSON.GetValue<string>('uf', '')
             );
             Result := True;
           end;
         finally
-          JSON.Free; // Importante liberar o JSON da memória
+          JSON.Free;
         end;
       end;
     end;
   finally
-    HTTP.Free; // Importante liberar o componente HTTP da memória
+    HTTP.Free;
   end;
 end;
 

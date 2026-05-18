@@ -194,13 +194,13 @@ begin
   begin
     LimparCampos;
     btnSalvarAlterar.Caption := 'Cadastrar';
-    btnExcluir.Visible := False; // Some o botão de excluir
+    btnExcluir.Visible := False;
     AlternarModoEdicao(True);
   end
   else if Acao = 'ALTERAR' then
   begin
     btnSalvarAlterar.Caption := 'Alterar';
-    btnExcluir.Visible := True; // Aparece na alteração (se não for Editor)
+    btnExcluir.Visible := True;
     AlternarModoEdicao(True);
   end
   else if Acao = 'DETALHAR' then
@@ -211,7 +211,6 @@ end;
 
 procedure TuCadastrarAlterarPessoaForm.AlternarModoEdicao(Habilitar: Boolean);
 begin
-  // Trava ou destrava os Edits
   edtNomePessoa.ReadOnly := not Habilitar;
   edtMaskCPF.ReadOnly := not Habilitar;
   edtRG.ReadOnly := not Habilitar;
@@ -225,11 +224,9 @@ begin
   cmbTipoPessoa.Enabled := Habilitar;
   dtPckDataNascimento.Enabled := Habilitar;
 
-  // Controle de botões
   btnSalvarAlterar.Visible := Habilitar;
-  btnEditar.Visible := not Habilitar; // O botão editar só aparece se NÃO estiver habilitado
+  btnEditar.Visible := not Habilitar;
 
-  // Regra do Excluir: Só aparece se estiver habilitado e NÃO for Editor
   if Assigned(LoginForm.UsuarioLogado) then
     btnExcluir.Visible := Habilitar and (uLoginForm.LoginForm.UsuarioLogado.Perfil <> 'EDITOR');
 end;
@@ -247,7 +244,6 @@ begin
     Lista := DAO.BuscarTodos;
     try
       for Tipo in Lista do
-        // Guarda o nome visualmente, e o ID escondido na memória do item
         cmbTipoPessoa.Items.AddObject(Tipo.Descricao, TObject(Tipo.ID));
     finally
       Lista.Free;
@@ -263,7 +259,6 @@ var
   Endereco: TEndereco;
   CEPTratado: string;
 begin
-  // Tira o traço da máscara
   CEPTratado := StringReplace(edtMaskCEP.Text, '-', '', [rfReplaceAll]);
 
   if Trim(CEPTratado) = '' then Exit;
@@ -300,7 +295,7 @@ begin
   edtBairro.Clear;
   edtCidade.Clear;
   edtEstado.Clear;
-  dtPckDataNascimento.Date := Date; // Seta para a data de hoje
+  dtPckDataNascimento.Date := Date;
 
   FPessoaIDAtual := 0;
   FEnderecoIDAtual := 0;
