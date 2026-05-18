@@ -119,7 +119,7 @@ O script do banco de dados pré-popula o sistema com dois usuários base:
 | Usuário  | Senha      | Perfil de Acesso    | Restrições                 |
 | -------- | ---------- | ------------------- | -------------------------- |
 | `admin`  | `admin123` | ADM (Administrador) | Acesso total ao sistema    |
-| `editor` | `admin123` | EDITOR (Operador)   | Não pode excluir registros |
+| `editor` | `TEST`     | EDITOR (Operador)   | Não pode excluir registros |
 
 ---
 
