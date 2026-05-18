@@ -1,0 +1,99 @@
+unit EnderecoController;
+
+interface
+
+uses
+  uEndereco, EnderecoDAO, FireDAC.Comp.Client, System.SysUtils, System.JSON,
+  System.Net.HttpClient, System.Net.URLClient;
+
+type
+  TEnderecoController = class
+  private
+    FConn: TFDConnection;
+    FEnderecoDAO: TEnderecoDAO;
+  public
+    constructor Create(AConn: TFDConnection);
+    destructor Destroy; override;
+
+    // CRUD
+    function Inserir(Endereco: TEndereco): Boolean;
+    function Atualizar(Endereco: TEndereco): Boolean;
+    function Excluir(EnderecoID: Integer): Boolean;
+    function BuscarPorID(EnderecoID: Integer): TEndereco;
+
+    // Integração VIACEP
+    function BuscarEnderecoViaCEP(CEP: string; out Endereco: TEndereco): Boolean;
+  end;
+
+implementation
+
+constructor TEnderecoController.Create(AConn: TFDConnection);
+begin
+  FConn := AConn;
+  FEnderecoDAO := TEnderecoDAO.Create(FConn);
+end;
+
+destructor TEnderecoController.Destroy;
+begin
+  FEnderecoDAO.Free;
+  inherited;
+end;
+
+function TEnderecoController.Inserir(Endereco: TEndereco): Boolean;
+begin
+  Result := FEnderecoDAO.Inserir(Endereco);
+end;
+
+function TEnderecoController.Atualizar(Endereco: TEndereco): Boolean;
+begin
+  Result := FEnderecoDAO.Atualizar(Endereco);
+end;
+
+function TEnderecoController.Excluir(EnderecoID: Integer): Boolean;
+begin
+  Result := FEnderecoDAO.Excluir(EnderecoID);
+end;
+
+function TEnderecoController.BuscarPorID(EnderecoID: Integer): TEndereco;
+begin
+  Result := FEnderecoDAO.BuscarPorID(EnderecoID);
+end;
+
+function TEnderecoController.BuscarEnderecoViaCEP(CEP: string; out Endereco: TEndereco): Boolean;
+var
+  HTTP: TNetHTTPClient;
+  Response: IHTTPResponse;
+  JSON: TJSONObject;
+begin
+  Result := False;
+  Endereco := nil;
+  HTTP := TNetHTTPClient.Create(nil);
+  try
+    Response := HTTP.Get('https://viacep.com.br/ws/' + CEP + '/json/');
+    if Response.StatusCode = 200 then
+    begin
+      JSON := TJSONObject.ParseJSONValue(Response.ContentAsString(TEncoding.UTF8)) as TJSONObject;
+      try
+        if (JSON <> nil) and (JSON.GetValue('erro') = nil) then
+        begin
+          Endereco := uEndereco.TEndereco.Create(
+            0, // ID será gerado ao inserir no banco
+            JSON.GetValue('cep').Value,
+            JSON.GetValue('logradouro').Value,
+            '', // complemento (pode vir em outro campo se quiser tratar)
+            JSON.GetValue('bairro').Value,
+            JSON.GetValue('localidade').Value,
+            JSON.GetValue('uf').Value
+          );
+          Result := True;
+        end;
+      finally
+        JSON.Free;
+      end;
+    end;
+  finally
+    HTTP.Free;
+  end;
+end;
+
+end.

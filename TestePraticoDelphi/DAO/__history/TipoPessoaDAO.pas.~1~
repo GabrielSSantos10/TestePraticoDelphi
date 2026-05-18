@@ -1,0 +1,55 @@
+unit TipoPessoaDAO;
+
+interface
+
+uses
+  System.SysUtils, FireDAC.Comp.Client, uTipoPessoa;
+
+type
+  TTipoPessoaDAO = class
+  private
+    FConn: TFDConnection;
+  public
+    constructor Create(AConn: TFDConnection);
+
+    function BuscarPorID(AID: Integer): TTipoPessoa;
+    function BuscarTodos: TArray<TTipoPessoa>;
+    function Inserir(Tipo: TTipoPessoa): Boolean;
+    function Atualizar(Tipo: TTipoPessoa): Boolean;
+    function Excluir(AID: Integer): Boolean;
+  end;
+
+implementation
+
+constructor TTipoPessoaDAO.Create(AConn: TFDConnection);
+begin
+  FConn := AConn;
+end;
+
+// Exemplo de busca por ID (outros métodos semelhantes)
+function TTipoPessoaDAO.BuscarPorID(AID: Integer): TTipoPessoa;
+var
+  qry: TFDQuery;
+begin
+  Result := nil;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'SELECT tipo_pessoa_id, descricao FROM TipoPessoa WHERE tipo_pessoa_id = :id';
+    qry.ParamByName('id').AsInteger := AID;
+    qry.Open;
+    if not qry.Eof then
+    begin
+      Result := TTipoPessoa.Create(
+        qry.FieldByName('tipo_pessoa_id').AsInteger,
+        qry.FieldByName('descricao').AsString
+      );
+    end;
+  finally
+    qry.Free;
+  end;
+end;
+
+// Outros métodos: BuscarTodos, Inserir, Atualizar, Excluir são semelhantes e podem ser detalhados depois
+
+end.

@@ -1,0 +1,304 @@
+unit uCadastroAlteraPessoaForm;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.ToolWin, Vcl.Mask, FireDAC.Comp.Client, uUsuario,
+  Vcl.StdCtrls, TipoPessoaDAO, uTipoPessoa, EnderecoController, PessoaController, uPessoa, uEndereco,
+  System.Generics.Collections, uValidador;
+
+type
+  TuCadastrarAlterarPessoaForm = class(TForm)
+    lblTituloDadosPessoais: TLabel;
+    lblTituloEndereco: TLabel;
+    lblNomePessoa: TLabel;
+    edtNomePessoa: TEdit;
+    lblCPF: TLabel;
+    edtMaskCPF: TMaskEdit;
+    lblRG: TLabel;
+    edtRG: TEdit;
+    lblEmail: TLabel;
+    edtMaskEmail: TMaskEdit;
+    lblTipoPessoa: TLabel;
+    cmbTipoPessoa: TComboBox;
+    lblDataNascimento: TLabel;
+    dtPckDataNascimento: TDateTimePicker;
+    lblTelefone: TLabel;
+    edtMaskTelefone: TMaskEdit;
+    lblCEP: TLabel;
+    edtMaskCEP: TMaskEdit;
+    lblLogradouro: TLabel;
+    edtLogradouro: TEdit;
+    lblBairro: TLabel;
+    edtBairro: TEdit;
+    lblCidade: TLabel;
+    edtCidade: TEdit;
+    lblEstado: TLabel;
+    edtEstado: TEdit;
+    btnSalvarAlterar: TButton;
+    btnExcluir: TButton;
+    btnCancelar: TButton;
+    btnEditar: TButton;
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnEditarClick(Sender: TObject);
+    procedure AlternarModoEdicao(Habilitar: Boolean);
+    procedure edtMaskCEPExit(Sender: TObject);
+    procedure btnSalvarAlterarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    FConn: TFDConnection;
+    FAcaoAtual: string;
+    FPessoaIDAtual: Integer;
+    FEnderecoIDAtual: Integer;
+    FUsuarioIDLogado: Integer;
+    procedure PrepararTela(Acao: string; UsuarioLogado: TUsuario);
+    procedure CarregarTiposPessoa;
+    procedure LimparCampos;
+
+  end;
+
+var
+  uCadastrarAlterarPessoaForm: TuCadastrarAlterarPessoaForm;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  uLoginForm;
+
+procedure TuCadastrarAlterarPessoaForm.btnCancelarClick(Sender: TObject);
+begin
+  Self.Close;
+end;
+
+procedure TuCadastrarAlterarPessoaForm.btnEditarClick(Sender: TObject);
+begin
+  PrepararTela('ALTERAR', LoginForm.UsuarioLogado);
+end;
+
+procedure TuCadastrarAlterarPessoaForm.btnExcluirClick(Sender: TObject);
+var
+  Controller: TPessoaController;
+begin
+  if MessageDlg('Tem certeza que deseja excluir este cadastro?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+  begin
+    Controller := TPessoaController.Create(FConn, FUsuarioIDLogado);
+    try
+      if Controller.ExcluirPessoa(FPessoaIDAtual) then
+      begin
+        ShowMessage('Registro excluído com sucesso!');
+        Self.Close;
+      end;
+    finally
+      Controller.Free;
+    end;
+  end;
+end;
+
+procedure TuCadastrarAlterarPessoaForm.btnSalvarAlterarClick(Sender: TObject);
+var
+  Controller: TPessoaController;
+  Pessoa: TPessoa;
+  Endereco: TEndereco;
+begin
+  if Trim(edtNomePessoa.Text) = '' then
+  begin
+    ShowMessage('O Nome é obrigatório!');
+    edtNomePessoa.SetFocus;
+    Exit;
+  end;
+
+  if not ValidarCPF(edtMaskCPF.Text) then
+  begin
+    ShowMessage('O CPF informado é inválido!');
+    edtMaskCPF.SetFocus;
+    Exit;
+  end;
+
+  if cmbTipoPessoa.ItemIndex = -1 then
+  begin
+    ShowMessage('Selecione o Tipo de Pessoa!');
+    cmbTipoPessoa.SetFocus;
+    Exit;
+  end;
+
+  if Pos('@', edtMaskEmail.Text) = 0 then
+  begin
+    ShowMessage('Por favor, informe um e-mail válido contendo "@".');
+    edtMaskEmail.SetFocus;
+    Exit;
+  end;
+
+  Pessoa := TPessoa.Create;
+  Endereco := TEndereco.Create;
+  Controller := TPessoaController.Create(FConn, FUsuarioIDLogado);
+  try
+    Endereco.CEP := edtMaskCEP.Text;
+    Endereco.Logradouro := edtLogradouro.Text;
+    Endereco.Bairro := edtBairro.Text;
+    Endereco.Cidade := edtCidade.Text;
+    Endereco.Estado := edtEstado.Text;
+
+    Pessoa.Nome := edtNomePessoa.Text;
+    Pessoa.CPF := edtMaskCPF.Text;
+    Pessoa.RG := edtRG.Text;
+    Pessoa.Email := edtMaskEmail.Text;
+    Pessoa.Telefone := edtMaskTelefone.Text;
+    Pessoa.DataNascimento := dtPckDataNascimento.Date;
+
+    if cmbTipoPessoa.ItemIndex > -1 then
+      Pessoa.TipoPessoaID := Integer(cmbTipoPessoa.Items.Objects[cmbTipoPessoa.ItemIndex]);
+
+    if FAcaoAtual = 'INSERIR' then
+    begin
+      if Controller.InserirNovaPessoa(Pessoa, Endereco) then
+      begin
+        ShowMessage('Cadastro realizado com sucesso!');
+        Self.Close;
+      end;
+    end
+    else if FAcaoAtual = 'ALTERAR' then
+    begin
+      Pessoa.ID := FPessoaIDAtual;
+      Pessoa.EnderecoID := FEnderecoIDAtual;
+      Endereco.ID := FEnderecoIDAtual;
+
+      if Controller.AtualizarPessoa(Pessoa, Endereco) then
+      begin
+        ShowMessage('Alteração realizada com sucesso!');
+        Self.Close;
+      end;
+    end;
+  finally
+    Pessoa.Free;
+    Endereco.Free;
+    Controller.Free;
+  end;
+end;
+
+procedure TuCadastrarAlterarPessoaForm.PrepararTela(Acao: string; UsuarioLogado: TUsuario);
+begin
+  FAcaoAtual := Acao;
+
+  if Assigned(UsuarioLogado) then
+    FUsuarioIDLogado := UsuarioLogado.ID;
+
+  CarregarTiposPessoa;
+
+  if Acao = 'INSERIR' then
+  begin
+    LimparCampos;
+    btnSalvarAlterar.Caption := 'Cadastrar';
+    btnExcluir.Visible := False;
+    AlternarModoEdicao(True);
+  end
+  else if Acao = 'ALTERAR' then
+  begin
+    btnSalvarAlterar.Caption := 'Alterar';
+    btnExcluir.Visible := True;
+    AlternarModoEdicao(True);
+  end
+  else if Acao = 'DETALHAR' then
+  begin
+    AlternarModoEdicao(False);
+  end;
+end;
+
+procedure TuCadastrarAlterarPessoaForm.AlternarModoEdicao(Habilitar: Boolean);
+begin
+  edtNomePessoa.ReadOnly := not Habilitar;
+  edtMaskCPF.ReadOnly := not Habilitar;
+  edtRG.ReadOnly := not Habilitar;
+  edtMaskEmail.ReadOnly := not Habilitar;
+  edtMaskTelefone.ReadOnly := not Habilitar;
+  edtMaskCEP.ReadOnly := not Habilitar;
+  edtLogradouro.ReadOnly := not Habilitar;
+  edtBairro.ReadOnly := not Habilitar;
+  edtCidade.ReadOnly := not Habilitar;
+  edtEstado.ReadOnly := not Habilitar;
+  cmbTipoPessoa.Enabled := Habilitar;
+  dtPckDataNascimento.Enabled := Habilitar;
+
+  btnSalvarAlterar.Visible := Habilitar;
+  btnEditar.Visible := not Habilitar;
+
+  if Assigned(LoginForm.UsuarioLogado) then
+    btnExcluir.Visible := Habilitar and (uLoginForm.LoginForm.UsuarioLogado.Perfil <> 'EDITOR');
+end;
+
+procedure TuCadastrarAlterarPessoaForm.CarregarTiposPessoa;
+var
+  DAO: TTipoPessoaDAO;
+  Lista: TObjectList<TTipoPessoa>;
+  Tipo: TTipoPessoa;
+begin
+  if cmbTipoPessoa.Items.Count > 0 then Exit;
+  cmbTipoPessoa.Items.Clear;
+  DAO := TTipoPessoaDAO.Create(FConn);
+  try
+    Lista := DAO.BuscarTodos;
+    try
+      for Tipo in Lista do
+        cmbTipoPessoa.Items.AddObject(Tipo.Descricao, TObject(Tipo.ID));
+    finally
+      Lista.Free;
+    end;
+  finally
+    DAO.Free;
+  end;
+end;
+
+procedure TuCadastrarAlterarPessoaForm.edtMaskCEPExit(Sender: TObject);
+var
+  Controller: TEnderecoController;
+  Endereco: TEndereco;
+  CEPTratado: string;
+begin
+  CEPTratado := StringReplace(edtMaskCEP.Text, '-', '', [rfReplaceAll]);
+
+  if Trim(CEPTratado) = '' then Exit;
+
+  Controller := TEnderecoController.Create(FConn);
+  try
+    if Controller.BuscarEnderecoViaCEP(CEPTratado, Endereco) then
+    begin
+      try
+        edtLogradouro.Text := Endereco.Logradouro;
+        edtBairro.Text := Endereco.Bairro;
+        edtCidade.Text := Endereco.Cidade;
+        edtEstado.Text := Endereco.Estado;
+      finally
+        Endereco.Free;
+      end;
+    end
+    else
+      ShowMessage('CEP não encontrado!');
+  finally
+    Controller.Free;
+  end;
+end;
+
+procedure TuCadastrarAlterarPessoaForm.LimparCampos;
+begin
+  edtNomePessoa.Clear;
+  edtMaskCPF.Clear;
+  edtRG.Clear;
+  edtMaskEmail.Clear;
+  edtMaskTelefone.Clear;
+  edtMaskCEP.Clear;
+  edtLogradouro.Clear;
+  edtBairro.Clear;
+  edtCidade.Clear;
+  edtEstado.Clear;
+  dtPckDataNascimento.Date := Date;
+
+  FPessoaIDAtual := 0;
+  FEnderecoIDAtual := 0;
+end;
+
+end.

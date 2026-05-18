@@ -1,0 +1,40 @@
+unit uUsuario;
+
+interface
+
+type
+  TUsuario = class
+  private
+    FID: Integer;
+    FLogin: string;
+    FSenhaHash: string;
+    FPerfil: string;
+  public
+    property ID: Integer read FID write FID;
+    property Login: string read FLogin write FLogin;
+    property SenhaHash: string read FSenhaHash write FSenhaHash;
+    property Perfil: string read FPerfil write FPerfil;
+
+    constructor Create; overload;
+    constructor Create(AID: Integer; ALogin, ASenhaHash, APerfil: string); overload;
+  end;
+
+implementation
+
+constructor TUsuario.Create;
+begin
+  FID := 0;
+  FLogin := '';
+  FSenhaHash := '';
+  FPerfil := '';
+end;
+
+constructor TUsuario.Create(AID: Integer; ALogin, ASenhaHash, APerfil: string);
+begin
+  FID := AID;
+  FLogin := ALogin;
+  FSenhaHash := ASenhaHash;
+  FPerfil := APerfil;
+end;
+
+end.

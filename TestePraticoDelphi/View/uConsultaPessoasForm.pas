@@ -1,0 +1,230 @@
+unit uConsultaPessoasForm;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, FireDAC.Comp.Client,
+  uUsuario, uCadastroAlteraPessoaForm, Data.DB, Vcl.Grids, Vcl.DBGrids,
+  Vcl.ExtCtrls, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, Vcl.Mask,
+  PessoaController, EnderecoController, uPessoa, uEndereco;
+
+type
+  TuConsultarPessoas = class(TForm)
+    btnCadastrar: TButton;
+    btnConsultar: TButton;
+    btnConsultarTudo: TButton;
+    btnLogout: TButton;
+    gridPessoas: TDBGrid;
+    Panel1: TPanel;
+    lblNomePessoa: TLabel;
+    Panel2: TPanel;
+    edtNomePessoa: TEdit;
+    lblEmail: TLabel;
+    lblCPF: TLabel;
+    edtMaskCPF: TMaskEdit;
+    edtMaskEmail: TMaskEdit;
+    qryConsulta: TFDQuery;
+    dsConsulta: TDataSource;
+    btnDetalhar: TButton;
+    procedure btnCadastrarClick(Sender: TObject);
+    procedure btnLogoutClick(Sender: TObject);
+    procedure btnDetalharClick(Sender: TObject);
+    procedure btnConsultarTudoClick(Sender: TObject);
+    procedure btnConsultarClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+  private
+    { Private declarations }
+    procedure ConfigurarColunasGrid;
+  public
+    { Public declarations }
+    FConn: TFDConnection;
+    FUsuarioLogado: TUsuario;
+  end;
+
+var
+  uConsultarPessoas: TuConsultarPessoas;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  uLoginForm;
+
+procedure TuConsultarPessoas.btnCadastrarClick(Sender: TObject);
+begin
+if not Assigned(uCadastrarAlterarPessoaForm) then
+    Application.CreateForm(TuCadastrarAlterarPessoaForm, uCadastrarAlterarPessoaForm);
+
+  uCadastrarAlterarPessoaForm.FConn := Self.FConn;
+
+  uCadastrarAlterarPessoaForm.PrepararTela('INSERIR', Self.FUsuarioLogado);
+
+  uCadastrarAlterarPessoaForm.ShowModal;
+end;
+
+procedure TuConsultarPessoas.btnConsultarClick(Sender: TObject);
+var
+  vSQL: string;
+begin
+  vSQL := 'SELECT p.pessoa_id, p.nome, t.descricao as tipo_pessoa, p.cpf ' +
+          'FROM Pessoa p ' +
+          'INNER JOIN TipoPessoa t ON p.tipo_pessoa_id = t.tipo_pessoa_id ' +
+          'WHERE 1=1 ';
+
+  if Trim(edtNomePessoa.Text) <> '' then
+    vSQL := vSQL + ' AND p.nome LIKE ' + QuotedStr('%' + Trim(edtNomePessoa.Text) + '%');
+
+  if Trim(StringReplace(edtMaskCPF.Text, '-', '', [rfReplaceAll])) <> '' then
+    vSQL := vSQL + ' AND p.cpf LIKE ' + QuotedStr('%' + Trim(edtMaskCPF.Text) + '%');
+
+  if Trim(edtMaskEmail.Text) <> '' then
+     vSQL := vSQL + ' AND p.email LIKE ' + QuotedStr('%' + Trim(edtMaskEmail.Text) + '%');
+
+  qryConsulta.Close;
+  qryConsulta.Connection := Self.FConn;
+  qryConsulta.SQL.Text := vSQL;
+
+  qryConsulta.FormatOptions.OwnMapRules := True;
+  qryConsulta.FormatOptions.MapRules.Clear;
+  with qryConsulta.FormatOptions.MapRules.Add do
+  begin
+    SourceDataType := dtWideMemo;
+    TargetDataType := dtWideString;
+  end;
+
+  qryConsulta.Open;
+  ConfigurarColunasGrid;
+end;
+
+procedure TuConsultarPessoas.btnConsultarTudoClick(Sender: TObject);
+begin
+  qryConsulta.Close;
+  qryConsulta.Connection := Self.FConn;
+  qryConsulta.SQL.Text :=
+    'SELECT p.pessoa_id, p.nome, t.descricao as tipo_pessoa, p.cpf ' +
+    'FROM Pessoa p ' +
+    'INNER JOIN TipoPessoa t ON p.tipo_pessoa_id = t.tipo_pessoa_id';
+
+  qryConsulta.FormatOptions.OwnMapRules := True;
+  qryConsulta.FormatOptions.MapRules.Clear;
+  with qryConsulta.FormatOptions.MapRules.Add do
+  begin
+    SourceDataType := dtWideMemo;
+    TargetDataType := dtWideString;
+  end;
+
+  qryConsulta.Open;
+  ConfigurarColunasGrid;
+end;
+
+procedure TuConsultarPessoas.btnDetalharClick(Sender: TObject);
+var
+  PessoaID: Integer;
+  Controller: TPessoaController;
+  EndController: TEnderecoController;
+  Pessoa: TPessoa;
+  Endereco: TEndereco;
+begin
+  if qryConsulta.IsEmpty then Exit;
+
+  PessoaID := qryConsulta.FieldByName('pessoa_id').AsInteger;
+
+  if not Assigned(uCadastrarAlterarPessoaForm) then
+    Application.CreateForm(TuCadastrarAlterarPessoaForm, uCadastrarAlterarPessoaForm);
+
+  uCadastrarAlterarPessoaForm.FConn := Self.FConn;
+
+  uCadastrarAlterarPessoaForm.PrepararTela('DETALHAR', Self.FUsuarioLogado);
+
+  Controller := TPessoaController.Create(Self.FConn, Self.FUsuarioLogado.ID);
+  EndController := TEnderecoController.Create(Self.FConn);
+  try
+    Pessoa := Controller.BuscarPessoaPorID(PessoaID);
+    if Assigned(Pessoa) then
+    begin
+      uCadastrarAlterarPessoaForm.FPessoaIDAtual := Pessoa.ID;
+      uCadastrarAlterarPessoaForm.FEnderecoIDAtual := Pessoa.EnderecoID;
+
+      uCadastrarAlterarPessoaForm.edtNomePessoa.Text := Pessoa.Nome;
+      uCadastrarAlterarPessoaForm.edtMaskCPF.Text := Pessoa.CPF;
+      uCadastrarAlterarPessoaForm.edtRG.Text := Pessoa.RG;
+      uCadastrarAlterarPessoaForm.edtMaskEmail.Text := Pessoa.Email;
+      uCadastrarAlterarPessoaForm.edtMaskTelefone.Text := Pessoa.Telefone;
+      uCadastrarAlterarPessoaForm.dtPckDataNascimento.Date := Pessoa.DataNascimento;
+
+      uCadastrarAlterarPessoaForm.cmbTipoPessoa.ItemIndex :=
+        uCadastrarAlterarPessoaForm.cmbTipoPessoa.Items.IndexOfObject(TObject(Pessoa.TipoPessoaID));
+
+      Endereco := EndController.BuscarPorID(Pessoa.EnderecoID);
+      if Assigned(Endereco) then
+      begin
+        uCadastrarAlterarPessoaForm.edtMaskCEP.Text := Endereco.CEP;
+        uCadastrarAlterarPessoaForm.edtLogradouro.Text := Endereco.Logradouro;
+        uCadastrarAlterarPessoaForm.edtBairro.Text := Endereco.Bairro;
+        uCadastrarAlterarPessoaForm.edtCidade.Text := Endereco.Cidade;
+        uCadastrarAlterarPessoaForm.edtEstado.Text := Endereco.Estado;
+        Endereco.Free;
+      end;
+
+      Pessoa.Free;
+    end;
+  finally
+    Controller.Free;
+    EndController.Free;
+  end;
+
+  uCadastrarAlterarPessoaForm.ShowModal;
+end;
+
+procedure TuConsultarPessoas.btnLogoutClick(Sender: TObject);
+begin
+  qryConsulta.Close;
+
+  edtNomePessoa.Clear;
+  edtMaskCPF.Clear;
+  edtMaskEmail.Clear;
+
+  if Assigned(FUsuarioLogado) then
+    FreeAndNil(FUsuarioLogado);
+
+  LoginForm.edtSenha.Clear;
+  LoginForm.Show;
+
+  Self.Close;
+end;
+
+procedure TuConsultarPessoas.FormCreate(Sender: TObject);
+begin
+  qryConsulta.FormatOptions.MapRules.Clear;
+  with qryConsulta.FormatOptions.MapRules.Add do
+  begin
+    SourceDataType := dtWideMemo;
+    TargetDataType := dtWideString;
+  end;
+end;
+
+procedure TuConsultarPessoas.ConfigurarColunasGrid;
+begin
+  if qryConsulta.IsEmpty then Exit;
+
+  qryConsulta.FieldByName('pessoa_id').DisplayLabel := 'ID';
+  qryConsulta.FieldByName('pessoa_id').DisplayWidth := 5;
+
+  qryConsulta.FieldByName('nome').DisplayLabel := 'Nome Completo';
+  qryConsulta.FieldByName('nome').DisplayWidth := 35;
+
+  qryConsulta.FieldByName('tipo_pessoa').DisplayLabel := 'Tipo';
+  qryConsulta.FieldByName('tipo_pessoa').DisplayWidth := 15;
+
+  qryConsulta.FieldByName('cpf').DisplayLabel := 'CPF';
+  qryConsulta.FieldByName('cpf').DisplayWidth := 15;
+
+  if qryConsulta.FieldByName('cpf') is TStringField then
+    TStringField(qryConsulta.FieldByName('cpf')).EditMask := '000\.000\.000\-00;0;_';
+end;
+
+end.
