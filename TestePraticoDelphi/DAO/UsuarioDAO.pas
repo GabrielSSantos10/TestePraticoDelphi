@@ -1,0 +1,160 @@
+unit UsuarioDAO;
+
+interface
+
+uses
+  System.SysUtils, System.Generics.Collections, FireDAC.Comp.Client, FireDAC.DApt, uUsuario;
+
+type
+  TUsuarioDAO = class
+  private
+    FConn: TFDConnection;
+  public
+    constructor Create(AConn: TFDConnection);
+
+    function BuscarPorID(AID: Integer): TUsuario;
+    function BuscarPorLogin(ALogin: string): TUsuario;
+    function BuscarTodos: TObjectList<TUsuario>;
+    function Inserir(Usuario: TUsuario): Boolean;
+    function Atualizar(Usuario: TUsuario): Boolean;
+    function Excluir(AID: Integer): Boolean;
+  end;
+
+implementation
+
+constructor TUsuarioDAO.Create(AConn: TFDConnection);
+begin
+  FConn := AConn;
+end;
+
+function TUsuarioDAO.BuscarPorID(AID: Integer): TUsuario;
+var
+  qry: TFDQuery;
+begin
+  Result := nil;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'SELECT * FROM Usuario WHERE usuario_id = :id';
+    qry.ParamByName('id').AsInteger := AID;
+    qry.Open;
+    if not qry.Eof then
+      Result := TUsuario.Create(
+        qry.FieldByName('usuario_id').AsInteger,
+        qry.FieldByName('login').AsString,
+        qry.FieldByName('senha_hash').AsString,
+        qry.FieldByName('perfil').AsString
+      );
+  finally
+    qry.Free;
+  end;
+end;
+
+function TUsuarioDAO.BuscarPorLogin(ALogin: string): TUsuario;
+var
+  qry: TFDQuery;
+begin
+  Result := nil;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'SELECT * FROM Usuario WHERE login = :login';
+    qry.ParamByName('login').AsString := ALogin;
+    qry.Open;
+    if not qry.Eof then
+      Result := TUsuario.Create(
+        qry.FieldByName('usuario_id').AsInteger,
+        qry.FieldByName('login').AsString,
+        qry.FieldByName('senha_hash').AsString,
+        qry.FieldByName('perfil').AsString
+      );
+  finally
+    qry.Free;
+  end;
+end;
+
+function TUsuarioDAO.BuscarTodos: TObjectList<TUsuario>;
+var
+  qry: TFDQuery;
+  item: TUsuario;
+begin
+  Result := TObjectList<TUsuario>.Create;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'SELECT * FROM Usuario';
+    qry.Open;
+    while not qry.Eof do
+    begin
+      item := TUsuario.Create(
+        qry.FieldByName('usuario_id').AsInteger,
+        qry.FieldByName('login').AsString,
+        qry.FieldByName('senha_hash').AsString,
+        qry.FieldByName('perfil').AsString
+      );
+      Result.Add(item);
+      qry.Next;
+    end;
+  finally
+    qry.Free;
+  end;
+end;
+
+function TUsuarioDAO.Inserir(Usuario: TUsuario): Boolean;
+var
+  qry: TFDQuery;
+begin
+  Result := False;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'INSERT INTO Usuario (login, senha_hash, perfil) VALUES (:login, :senha_hash, :perfil)';
+    qry.ParamByName('login').AsString := Usuario.Login;
+    qry.ParamByName('senha_hash').AsString := Usuario.SenhaHash;
+    qry.ParamByName('perfil').AsString := Usuario.Perfil;
+    qry.ExecSQL;
+    Result := True;
+  finally
+    qry.Free;
+  end;
+end;
+
+function TUsuarioDAO.Atualizar(Usuario: TUsuario): Boolean;
+var
+  qry: TFDQuery;
+begin
+  Result := False;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text :=
+      'UPDATE Usuario SET login = :login, senha_hash = :senha_hash, perfil = :perfil WHERE usuario_id = :id';
+    qry.ParamByName('login').AsString := Usuario.Login;
+    qry.ParamByName('senha_hash').AsString := Usuario.SenhaHash;
+    qry.ParamByName('perfil').AsString := Usuario.Perfil;
+    qry.ParamByName('id').AsInteger := Usuario.ID;
+    qry.ExecSQL;
+    Result := True;
+  finally
+    qry.Free;
+  end;
+end;
+
+function TUsuarioDAO.Excluir(AID: Integer): Boolean;
+var
+  qry: TFDQuery;
+begin
+  Result := False;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'DELETE FROM Usuario WHERE usuario_id = :id';
+    qry.ParamByName('id').AsInteger := AID;
+    qry.ExecSQL;
+    Result := True;
+  finally
+    qry.Free;
+  end;
+end;
+
+end.

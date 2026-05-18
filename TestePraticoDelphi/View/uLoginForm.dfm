@@ -1,0 +1,68 @@
+object LoginForm: TLoginForm
+  Left = 0
+  Top = 0
+  Caption = 'Login'
+  ClientHeight = 441
+  ClientWidth = 624
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  OnCreate = FormCreate
+  TextHeight = 15
+  object lblLogin: TLabel
+    Left = 216
+    Top = 80
+    Width = 30
+    Height = 15
+    Caption = 'Login'
+  end
+  object lblSenha: TLabel
+    Left = 216
+    Top = 168
+    Width = 32
+    Height = 15
+    Caption = 'Senha'
+  end
+  object lblMensagem: TLabel
+    Left = 147
+    Top = 32
+    Width = 3
+    Height = 15
+  end
+  object Label1: TLabel
+    AlignWithMargins = True
+    Left = 168
+    Top = 32
+    Width = 59
+    Height = 15
+    Alignment = taCenter
+    Caption = 'Mensagem'
+  end
+  object edtLogin: TEdit
+    Left = 216
+    Top = 101
+    Width = 121
+    Height = 23
+    TabOrder = 0
+  end
+  object edtSenha: TEdit
+    Left = 216
+    Top = 189
+    Width = 121
+    Height = 23
+    PasswordChar = '*'
+    TabOrder = 1
+  end
+  object btnEntrar: TButton
+    Left = 240
+    Top = 252
+    Width = 75
+    Height = 25
+    Caption = 'Entrar'
+    TabOrder = 2
+    OnClick = btnEntrarClick
+  end
+end

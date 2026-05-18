@@ -1,0 +1,48 @@
+object uConsultarPessoas: TuConsultarPessoas
+  Left = 0
+  Top = 0
+  Caption = 'uConsultarPessoas'
+  ClientHeight = 441
+  ClientWidth = 624
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  TextHeight = 15
+  object btnCadastrar: TButton
+    Left = 392
+    Top = 105
+    Width = 160
+    Height = 40
+    Caption = 'Cadastrar Nova Pessoa'
+    TabOrder = 0
+    OnClick = btnCadastrarClick
+  end
+  object btnConsultar: TButton
+    Left = 216
+    Top = 105
+    Width = 160
+    Height = 40
+    Caption = 'Consultar'
+    TabOrder = 1
+  end
+  object btnConsultarTudo: TButton
+    Left = 40
+    Top = 105
+    Width = 160
+    Height = 40
+    Caption = 'Consultar Todas as Pessoas'
+    TabOrder = 2
+  end
+  object btnLogout: TButton
+    Left = 456
+    Top = 8
+    Width = 160
+    Height = 40
+    Caption = 'Sair'
+    TabOrder = 3
+    OnClick = btnLogoutClick
+  end
+end
