@@ -70,21 +70,17 @@ procedure TuConsultarPessoas.btnConsultarClick(Sender: TObject);
 var
   vSQL: string;
 begin
-  // Base do SQL limpa sem os CASTs
   vSQL := 'SELECT p.pessoa_id, p.nome, t.descricao as tipo_pessoa, p.cpf ' +
           'FROM Pessoa p ' +
           'INNER JOIN TipoPessoa t ON p.tipo_pessoa_id = t.tipo_pessoa_id ' +
           'WHERE 1=1 ';
 
-  // Filtro por Nome
   if Trim(edtNomePessoa.Text) <> '' then
     vSQL := vSQL + ' AND p.nome LIKE ' + QuotedStr('%' + Trim(edtNomePessoa.Text) + '%');
 
-  // Filtro por CPF
   if Trim(StringReplace(edtMaskCPF.Text, '-', '', [rfReplaceAll])) <> '' then
     vSQL := vSQL + ' AND p.cpf LIKE ' + QuotedStr('%' + Trim(edtMaskCPF.Text) + '%');
 
-  // Filtro por E-mail
   if Trim(edtMaskEmail.Text) <> '' then
      vSQL := vSQL + ' AND p.email LIKE ' + QuotedStr('%' + Trim(edtMaskEmail.Text) + '%');
 
@@ -92,7 +88,6 @@ begin
   qryConsulta.Connection := Self.FConn;
   qryConsulta.SQL.Text := vSQL;
 
-  // Garanta que as MapRules também estejam aqui antes do Open!
   qryConsulta.FormatOptions.OwnMapRules := True;
   qryConsulta.FormatOptions.MapRules.Clear;
   with qryConsulta.FormatOptions.MapRules.Add do
@@ -134,33 +129,26 @@ var
   Pessoa: TPessoa;
   Endereco: TEndereco;
 begin
-  // Se não tiver ninguém selecionado na Grid, não faz nada
   if qryConsulta.IsEmpty then Exit;
 
-  // Pega o ID da pessoa na linha clicada
   PessoaID := qryConsulta.FieldByName('pessoa_id').AsInteger;
 
   if not Assigned(uCadastrarAlterarPessoaForm) then
     Application.CreateForm(TuCadastrarAlterarPessoaForm, uCadastrarAlterarPessoaForm);
 
-  // 1. Passa a conexão
   uCadastrarAlterarPessoaForm.FConn := Self.FConn;
 
-  // 2. Trava a tela para modo leitura
   uCadastrarAlterarPessoaForm.PrepararTela('DETALHAR', Self.FUsuarioLogado);
 
-  // 3. Busca no banco e preenche a tela
-  Controller := TPessoaController.Create(Self.FConn);
+  Controller := TPessoaController.Create(Self.FConn, Self.FUsuarioLogado.ID);
   EndController := TEnderecoController.Create(Self.FConn);
   try
     Pessoa := Controller.BuscarPessoaPorID(PessoaID);
     if Assigned(Pessoa) then
     begin
-      // Guarda os IDs para caso o usuário clique em "Editar" depois
       uCadastrarAlterarPessoaForm.FPessoaIDAtual := Pessoa.ID;
       uCadastrarAlterarPessoaForm.FEnderecoIDAtual := Pessoa.EnderecoID;
 
-      // Preenche os Edits com os dados de Pessoa
       uCadastrarAlterarPessoaForm.edtNomePessoa.Text := Pessoa.Nome;
       uCadastrarAlterarPessoaForm.edtMaskCPF.Text := Pessoa.CPF;
       uCadastrarAlterarPessoaForm.edtRG.Text := Pessoa.RG;
@@ -168,11 +156,9 @@ begin
       uCadastrarAlterarPessoaForm.edtMaskTelefone.Text := Pessoa.Telefone;
       uCadastrarAlterarPessoaForm.dtPckDataNascimento.Date := Pessoa.DataNascimento;
 
-      // Seta a combo box no tipo correto
       uCadastrarAlterarPessoaForm.cmbTipoPessoa.ItemIndex :=
         uCadastrarAlterarPessoaForm.cmbTipoPessoa.Items.IndexOfObject(TObject(Pessoa.TipoPessoaID));
 
-      // Busca o endereço vinculado e preenche
       Endereco := EndController.BuscarPorID(Pessoa.EnderecoID);
       if Assigned(Endereco) then
       begin
@@ -225,12 +211,11 @@ procedure TuConsultarPessoas.ConfigurarColunasGrid;
 begin
   if qryConsulta.IsEmpty then Exit;
 
-  // Ajusta Título e Largura da Coluna (DisplayWidth)
   qryConsulta.FieldByName('pessoa_id').DisplayLabel := 'ID';
   qryConsulta.FieldByName('pessoa_id').DisplayWidth := 5;
 
   qryConsulta.FieldByName('nome').DisplayLabel := 'Nome Completo';
-  qryConsulta.FieldByName('nome').DisplayWidth := 35; // Aqui diminui o espação!
+  qryConsulta.FieldByName('nome').DisplayWidth := 35;
 
   qryConsulta.FieldByName('tipo_pessoa').DisplayLabel := 'Tipo';
   qryConsulta.FieldByName('tipo_pessoa').DisplayWidth := 15;
@@ -238,7 +223,6 @@ begin
   qryConsulta.FieldByName('cpf').DisplayLabel := 'CPF';
   qryConsulta.FieldByName('cpf').DisplayWidth := 15;
 
-  // Força a máscara visual direto no campo da memória
   if qryConsulta.FieldByName('cpf') is TStringField then
     TStringField(qryConsulta.FieldByName('cpf')).EditMask := '000\.000\.000\-00;0;_';
 end;

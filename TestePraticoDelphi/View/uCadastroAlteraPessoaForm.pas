@@ -50,10 +50,11 @@ type
     { Private declarations }
   public
     { Public declarations }
-    FConn: TFDConnection; // Adicione isso
-    FAcaoAtual: string;   // Adicione isso
-    FPessoaIDAtual: Integer;   // Para sabermos quem estamos editando/excluindo
-    FEnderecoIDAtual: Integer; // Para sabermos o endereço atual
+    FConn: TFDConnection;
+    FAcaoAtual: string;
+    FPessoaIDAtual: Integer;
+    FEnderecoIDAtual: Integer;
+    FUsuarioIDLogado: Integer;
     procedure PrepararTela(Acao: string; UsuarioLogado: TUsuario);
     procedure CarregarTiposPessoa;
     procedure LimparCampos;
@@ -86,7 +87,7 @@ var
 begin
   if MessageDlg('Tem certeza que deseja excluir este cadastro?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
   begin
-    Controller := TPessoaController.Create(FConn);
+    Controller := TPessoaController.Create(FConn, FUsuarioIDLogado);
     try
       if Controller.ExcluirPessoa(FPessoaIDAtual) then
       begin
@@ -105,7 +106,6 @@ var
   Pessoa: TPessoa;
   Endereco: TEndereco;
 begin
-  // Validação super rápida de exemplo
   if Trim(edtNomePessoa.Text) = '' then
   begin
     ShowMessage('O Nome é obrigatório!');
@@ -136,16 +136,14 @@ begin
 
   Pessoa := TPessoa.Create;
   Endereco := TEndereco.Create;
-  Controller := TPessoaController.Create(FConn);
+  Controller := TPessoaController.Create(FConn, FUsuarioIDLogado);
   try
-    // Preenche Endereço
     Endereco.CEP := edtMaskCEP.Text;
     Endereco.Logradouro := edtLogradouro.Text;
     Endereco.Bairro := edtBairro.Text;
     Endereco.Cidade := edtCidade.Text;
     Endereco.Estado := edtEstado.Text;
 
-    // Preenche Pessoa
     Pessoa.Nome := edtNomePessoa.Text;
     Pessoa.CPF := edtMaskCPF.Text;
     Pessoa.RG := edtRG.Text;
@@ -153,7 +151,6 @@ begin
     Pessoa.Telefone := edtMaskTelefone.Text;
     Pessoa.DataNascimento := dtPckDataNascimento.Date;
 
-    // Pega o ID do tipo de pessoa selecionado no ComboBox
     if cmbTipoPessoa.ItemIndex > -1 then
       Pessoa.TipoPessoaID := Integer(cmbTipoPessoa.Items.Objects[cmbTipoPessoa.ItemIndex]);
 
@@ -162,7 +159,7 @@ begin
       if Controller.InserirNovaPessoa(Pessoa, Endereco) then
       begin
         ShowMessage('Cadastro realizado com sucesso!');
-        Self.Close; // Fecha e volta pra lista
+        Self.Close;
       end;
     end
     else if FAcaoAtual = 'ALTERAR' then
@@ -187,6 +184,10 @@ end;
 procedure TuCadastrarAlterarPessoaForm.PrepararTela(Acao: string; UsuarioLogado: TUsuario);
 begin
   FAcaoAtual := Acao;
+
+  if Assigned(UsuarioLogado) then
+    FUsuarioIDLogado := UsuarioLogado.ID;
+
   CarregarTiposPessoa;
 
   if Acao = 'INSERIR' then

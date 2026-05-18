@@ -17,6 +17,7 @@ type
     function Inserir(Pessoa: TPessoa): Boolean;
     function Atualizar(Pessoa: TPessoa): Boolean;
     function Excluir(AID: Integer): Boolean;
+    function CpfJaExiste(ACpf: string; AIDDesconsiderar: Integer = 0): Boolean;
   end;
 
 implementation
@@ -156,6 +157,24 @@ begin
     qry.ParamByName('id').AsInteger := AID;
     qry.ExecSQL;
     Result := True;
+  finally
+    qry.Free;
+  end;
+end;
+
+function TPessoaDAO.CpfJaExiste(ACpf: string; AIDDesconsiderar: Integer = 0): Boolean;
+var
+  qry: TFDQuery;
+begin
+  Result := False;
+  qry := TFDQuery.Create(nil);
+  try
+    qry.Connection := FConn;
+    qry.SQL.Text := 'SELECT pessoa_id FROM Pessoa WHERE cpf = :cpf AND pessoa_id <> :id';
+    qry.ParamByName('cpf').AsString := ACpf;
+    qry.ParamByName('id').AsInteger := AIDDesconsiderar;
+    qry.Open;
+    Result := not qry.IsEmpty;
   finally
     qry.Free;
   end;

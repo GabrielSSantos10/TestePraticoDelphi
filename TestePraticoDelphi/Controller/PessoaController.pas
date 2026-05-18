@@ -4,7 +4,7 @@ interface
 
 uses
   uPessoa, uEndereco, PessoaDAO, EnderecoDAO, System.Generics.Collections,
-  FireDAC.Comp.Client, System.SysUtils;
+  FireDAC.Comp.Client, System.SysUtils, LogDAO, uLog;
 
 type
   TPessoaController = class
@@ -12,11 +12,13 @@ type
     FConn: TFDConnection;
     FPessoaDAO: TPessoaDAO;
     FEnderecoDAO: TEnderecoDAO;
+    FLogDAO: TLogDAO;
+    FUsuarioIDAtual: Integer;
+    procedure RegistrarLog(DAO: TLogDAO; UsuarioID: Integer; Acao, Detalhes: string);
   public
-    constructor Create(AConn: TFDConnection);
+    constructor Create(AConn: TFDConnection; AUsuarioID: Integer);
     destructor Destroy; override;
 
-    // Retorna True se OK, False se falhar.
     function InserirNovaPessoa(Pessoa: TPessoa; Endereco: TEndereco): Boolean;
     function AtualizarPessoa(Pessoa: TPessoa; Endereco: TEndereco): Boolean;
     function ExcluirPessoa(PessoaID: Integer): Boolean;
@@ -26,44 +28,52 @@ type
 
 implementation
 
-constructor TPessoaController.Create(AConn: TFDConnection);
+constructor TPessoaController.Create(AConn: TFDConnection; AUsuarioID: Integer);
 begin
   FConn := AConn;
+  FUsuarioIDAtual := AUsuarioID;
   FPessoaDAO := TPessoaDAO.Create(FConn);
   FEnderecoDAO := TEnderecoDAO.Create(FConn);
+  FLogDAO := TLogDAO.Create(FConn);
 end;
 
 destructor TPessoaController.Destroy;
 begin
   FPessoaDAO.Free;
   FEnderecoDAO.Free;
+  FLogDAO.Free;
   inherited;
 end;
 
 function TPessoaController.InserirNovaPessoa(Pessoa: TPessoa; Endereco: TEndereco): Boolean;
 begin
   Result := False;
-  FConn.StartTransaction; // 1. Inicia a transação
+
+  if FPessoaDAO.CpfJaExiste(Pessoa.CPF) then
+    raise Exception.Create('Este CPF já está cadastrado no sistema.');
+
+  FConn.StartTransaction;
   try
     if FEnderecoDAO.Inserir(Endereco) then
     begin
-      Endereco.ID := FEnderecoDAO.GetLastInsertID; // Lembre-se que criamos isso antes!
+      Endereco.ID := FEnderecoDAO.GetLastInsertID;
       Pessoa.EnderecoID := Endereco.ID;
 
       if FPessoaDAO.Inserir(Pessoa) then
       begin
-        FConn.Commit; // 2. Se as duas deram certo, salva de vez!
+        FConn.Commit;
         Result := True;
+        RegistrarLog(FLogDAO, FUsuarioIDAtual, 'INSERIR', 'Cadastrou a pessoa CPF: ' + Pessoa.CPF);
       end
       else
-        FConn.Rollback; // Desfaz se a pessoa falhou
+        FConn.Rollback;
     end
     else
-      FConn.Rollback; // Desfaz se o endereço falhou
+      FConn.Rollback;
   except
     on E: Exception do
     begin
-      FConn.Rollback; // 3. Desfaz em caso de erro fatal (ex: banco fora do ar)
+      FConn.Rollback;
       raise Exception.Create('Erro ao inserir pessoa: ' + E.Message);
     end;
   end;
@@ -72,9 +82,17 @@ end;
 function TPessoaController.AtualizarPessoa(Pessoa: TPessoa; Endereco: TEndereco): Boolean;
 begin
   Result := False;
+
+  if FPessoaDAO.CpfJaExiste(Pessoa.CPF, Pessoa.ID) then
+    raise Exception.Create('Este CPF já está cadastrado no sistema.');
+
   try
     if FEnderecoDAO.Atualizar(Endereco) then
+    begin
       Result := FPessoaDAO.Atualizar(Pessoa);
+      if Result then
+        RegistrarLog(FLogDAO, FUsuarioIDAtual, 'ATUALIZAR', 'Atualizou a pessoa CPF: ' + Pessoa.CPF);
+    end;
   except
     on E: Exception do
       raise Exception.Create('Erro ao atualizar pessoa: ' + E.Message);
@@ -92,6 +110,10 @@ begin
     begin
       Result := FPessoaDAO.Excluir(PessoaID) and
                 FEnderecoDAO.Excluir(Pessoa.EnderecoID);
+
+      if Result then
+        RegistrarLog(FLogDAO, FUsuarioIDAtual, 'EXCLUIR', 'Excluiu o usuário: ' + Pessoa.CPF);
+
       Pessoa.Free;
     end;
   except
@@ -108,6 +130,18 @@ end;
 function TPessoaController.BuscarTodos: TObjectList<TPessoa>;
 begin
   Result := FPessoaDAO.BuscarTodos;
+end;
+
+procedure TPessoaController.RegistrarLog(DAO: TLogDAO; UsuarioID: Integer; Acao, Detalhes: string);
+var
+  L: TLog;
+begin
+  L := TLog.Create(0, UsuarioID, Acao, Now, Detalhes);
+  try
+    DAO.Inserir(L);
+  finally
+    L.Free;
+  end;
 end;
 
 end.

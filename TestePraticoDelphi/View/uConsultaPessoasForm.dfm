@@ -106,12 +106,12 @@ object uConsultarPessoas: TuConsultarPessoas
     object edtMaskCPF: TMaskEdit
       Left = 9
       Top = 82
-      Width = 194
+      Width = 192
       Height = 23
-      EditMask = '000.000.000\-00;1;_'
+      EditMask = '000.000.000\-00;0;_'
       MaxLength = 14
       TabOrder = 4
-      Text = '   .   .   -  '
+      Text = ''
     end
     object edtMaskEmail: TMaskEdit
       Left = 210

@@ -14,16 +14,16 @@ object uCadastrarAlterarPessoaForm: TuCadastrarAlterarPessoaForm
   object lblNomePessoa: TLabel
     Left = 8
     Top = 40
-    Width = 90
+    Width = 95
     Height = 15
-    Caption = 'Nome completo:'
+    Caption = 'Nome completo*:'
   end
   object lblCPF: TLabel
     Left = 8
     Top = 107
-    Width = 24
+    Width = 29
     Height = 15
-    Caption = 'CPF:'
+    Caption = 'CPF*:'
   end
   object lblRG: TLabel
     Left = 200
@@ -35,37 +35,37 @@ object uCadastrarAlterarPessoaForm: TuCadastrarAlterarPessoaForm
   object lblEmail: TLabel
     Left = 368
     Top = 107
-    Width = 37
+    Width = 42
     Height = 15
-    Caption = 'E-mail:'
+    Caption = 'E-mail*:'
   end
   object lblCEP: TLabel
     Left = 8
     Top = 296
-    Width = 24
+    Width = 29
     Height = 15
-    Caption = 'CEP:'
+    Caption = 'CEP*:'
   end
   object lblBairro: TLabel
     Left = 8
     Top = 363
-    Width = 31
+    Width = 39
     Height = 15
-    Caption = 'Bairro'
+    Caption = 'Bairro*:'
   end
   object lblLogradouro: TLabel
     Left = 200
     Top = 296
-    Width = 65
+    Width = 70
     Height = 15
-    Caption = 'Logradouro:'
+    Caption = 'Logradouro*:'
   end
   object lblCidade: TLabel
     Left = 368
     Top = 363
-    Width = 40
+    Width = 45
     Height = 15
-    Caption = 'Cidade:'
+    Caption = 'Cidade*:'
   end
   object lblTituloDadosPessoais: TLabel
     Left = 8
@@ -96,30 +96,30 @@ object uCadastrarAlterarPessoaForm: TuCadastrarAlterarPessoaForm
   object lblTipoPessoa: TLabel
     Left = 8
     Top = 184
-    Width = 82
+    Width = 87
     Height = 15
-    Caption = 'Tipo de pessoa:'
+    Caption = 'Tipo de pessoa*:'
   end
   object lblTelefone: TLabel
     Left = 368
     Top = 184
-    Width = 48
+    Width = 53
     Height = 15
-    Caption = 'Telefone:'
+    Caption = 'Telefone*:'
   end
   object lblDataNascimento: TLabel
     Left = 200
     Top = 184
-    Width = 108
+    Width = 113
     Height = 15
-    Caption = 'Data de nascimento:'
+    Caption = 'Data de nascimento*:'
   end
   object lblEstado: TLabel
     Left = 576
     Top = 363
-    Width = 38
+    Width = 43
     Height = 15
-    Caption = 'Estado:'
+    Caption = 'Estado*:'
   end
   object edtNomePessoa: TEdit
     Left = 8
@@ -131,12 +131,12 @@ object uCadastrarAlterarPessoaForm: TuCadastrarAlterarPessoaForm
   object edtMaskCPF: TMaskEdit
     Left = 8
     Top = 136
-    Width = 144
+    Width = 142
     Height = 23
-    EditMask = '000.000.000\-00;1;_'
+    EditMask = '000.000.000\-00;0;_'
     MaxLength = 14
     TabOrder = 1
-    Text = '   .   .   -  '
+    Text = ''
   end
   object edtRG: TEdit
     Left = 200
@@ -179,22 +179,22 @@ object uCadastrarAlterarPessoaForm: TuCadastrarAlterarPessoaForm
   object edtMaskTelefone: TMaskEdit
     Left = 368
     Top = 205
-    Width = 359
+    Width = 355
     Height = 23
-    EditMask = '!\(00\) 00000\-0000;1;_'
+    EditMask = '!\(00\) 00000\-0000;0;_'
     MaxLength = 15
     TabOrder = 7
-    Text = '(  )      -    '
+    Text = ''
   end
   object edtMaskCEP: TMaskEdit
     Left = 8
     Top = 317
-    Width = 144
+    Width = 142
     Height = 23
-    EditMask = '00000\-000;1;_'
+    EditMask = '00000\-000;0;_'
     MaxLength = 9
     TabOrder = 8
-    Text = '     -   '
+    Text = ''
     OnExit = edtMaskCEPExit
   end
   object edtBairro: TEdit
