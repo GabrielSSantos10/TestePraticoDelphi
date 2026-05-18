@@ -55,7 +55,7 @@ CREATE TABLE Log (
 );
 
 -- Usuário ADM: login: admin, senha: admin123
--- Usuário Editor: login: editor, senha: admin123
+-- Usuário Editor: login: editor, senha: TEST
 
 INSERT INTO Usuario (login, senha_hash, perfil) VALUES 
   ('admin',  '0192023a7bbd73250516f069df18b500', 'ADM'),
