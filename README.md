@@ -45,7 +45,7 @@ O sistema implementa regras de controle de acesso baseadas no perfil do usuário
 
 ### Dados Limpos (Best Practices)
 
-Seguindo os padrões ideais de mercado, o sistema exibe máscaras de formatação em tempo de digitação (`CPF`, `CEP`, `Telefone`), mas limpa os dados antes da persistência através de uma unidade utilitária (`uUtils.pas`).
+Seguindo os padrões ideais de mercado, o sistema exibe máscaras de formatação em tempo de digitação (`CPF`, `CEP`, `Telefone`), mas limpa os dados antes da persistência através de uma unidade utilitária (`uValidador.pas`).
 
 O banco armazena apenas os caracteres numéricos puros, economizando espaço físico e otimizando índices.
 
